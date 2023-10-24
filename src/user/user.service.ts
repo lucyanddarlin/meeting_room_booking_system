@@ -12,6 +12,7 @@ import { User } from './entities/User';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { to } from 'src/utils';
+import { EmailService } from 'src/email/email.service';
 
 /**
  * bcrypt 加盐轮数
@@ -28,6 +29,13 @@ export class UserService {
   @Inject(RedisService)
   private readonly redisService: RedisService;
 
+  @Inject(EmailService)
+  private readonly emailService: EmailService;
+
+  /**
+   * 用户注册
+   * @param user
+   */
   async register(user: RegisterUserDto) {
     const captcha = await this.redisService.get(`captcha_${user.email}`);
 
@@ -58,5 +66,33 @@ export class UserService {
       throw new BadRequestException('注册异常');
     }
     return '注册成功';
+  }
+
+  /**
+   * 获取验证码
+   */
+  async getCaptcha(address: string) {
+    let captchaCode: string;
+    const existCaptchaCode = await this.redisService.get(`captcha_${address}`);
+    if (existCaptchaCode) {
+      captchaCode = existCaptchaCode;
+    } else {
+      captchaCode = Math.random().toString().slice(2, 8);
+    }
+
+    await this.redisService.set(`captcha_${address}`, captchaCode, 60);
+
+    const [err] = await to(
+      this.emailService.sendCaptcha({
+        to: address,
+        subject: '注册验证码',
+        html: `<p>你的验证码是 ${captchaCode}</p>`,
+      }),
+    );
+    if (err) {
+      console.log(err);
+      throw new BadRequestException(JSON.stringify(err));
+    }
+    return '验证码发送成功';
   }
 }
