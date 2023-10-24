@@ -33,6 +33,8 @@ export class UserService {
 
     if (!captcha) {
       throw new BadRequestException('验证码已失效');
+    } else if (captcha !== user.captcha) {
+      throw new BadRequestException('验证码错误');
     }
 
     const existUser = await this.userRepository.findOneBy({

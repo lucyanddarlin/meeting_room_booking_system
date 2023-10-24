@@ -21,7 +21,7 @@ export class User {
   username: string;
 
   @Column({
-    length: 50,
+    length: 200,
     comment: '密码',
   })
   password: string;
