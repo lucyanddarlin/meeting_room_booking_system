@@ -72,13 +72,7 @@ export class UserService {
    * 获取验证码
    */
   async getCaptcha(address: string) {
-    let captchaCode: string;
-    const existCaptchaCode = await this.redisService.get(`captcha_${address}`);
-    if (existCaptchaCode) {
-      captchaCode = existCaptchaCode;
-    } else {
-      captchaCode = Math.random().toString().slice(2, 8);
-    }
+    const captchaCode = Math.random().toString().slice(2, 8);
 
     await this.redisService.set(`captcha_${address}`, captchaCode, 60);
 
