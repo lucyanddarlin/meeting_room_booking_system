@@ -35,11 +35,4 @@ export class BusinessException extends HttpException {
       message: 'Access Forbidden',
     });
   }
-
-  static throwBadRequest(message: string) {
-    throw new BusinessException({
-      code: HttpStatus.BAD_REQUEST,
-      message,
-    });
-  }
 }
