@@ -36,7 +36,7 @@ export class AuthService {
         userId: payload.id,
         username: payload.username,
         roles: payload.roles,
-        permission: payload.permissions,
+        permissions: payload.permissions,
       },
       {
         expiresIn: this.configService.get('jwt_access_exp') ?? '30m',

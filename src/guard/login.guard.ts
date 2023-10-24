@@ -59,7 +59,7 @@ export class LoginGuard implements CanActivate {
 
     const [err, user] = await to<PayLoad>(this.jwtService.verifyAsync(jwt));
     if (err) {
-      throw new UnauthorizedException('JWT 过期');
+      throw new UnauthorizedException('JWT 校验失败');
     }
     request.user = user;
     return true;

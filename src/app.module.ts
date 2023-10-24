@@ -14,6 +14,7 @@ import { EmailModule } from './email/email.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { LoginGuard } from './guard/login.guard';
+import { PermissionGuard } from './guard/permission.guard';
 
 @Module({
   imports: [
@@ -65,6 +66,10 @@ import { LoginGuard } from './guard/login.guard';
     {
       provide: APP_GUARD,
       useClass: LoginGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
 })

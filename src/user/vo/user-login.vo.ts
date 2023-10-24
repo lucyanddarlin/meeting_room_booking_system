@@ -1,3 +1,5 @@
+import { Permission } from '../entities/Permission';
+
 interface UserInfo {
   id: number;
 
@@ -19,7 +21,7 @@ interface UserInfo {
 
   roles: string[];
 
-  permissions: string[];
+  permissions: Permission[];
 }
 
 export interface PayLoad extends Partial<UserInfo> {}
