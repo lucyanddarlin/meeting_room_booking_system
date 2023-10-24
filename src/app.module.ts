@@ -11,6 +11,7 @@ import { Role } from './user/entities/Role';
 import { Permission } from './user/entities/Permission';
 import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { EmailModule } from './email/email.module';
     UserModule,
     RedisModule,
     EmailModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

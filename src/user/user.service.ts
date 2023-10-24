@@ -5,8 +5,6 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -25,7 +23,8 @@ import {
   SALT_ROUNDS,
 } from 'src/config';
 import { UserLoginDto } from './dto/login-user.dto';
-import { LoginUserVo } from './vo/user-login.vo';
+import { LoginUserVo, PayLoad } from './vo/user-login.vo';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -46,11 +45,8 @@ export class UserService {
   @Inject(EmailService)
   private readonly emailService: EmailService;
 
-  @Inject(JwtService)
-  private readonly jwtService: JwtService;
-
-  @Inject(ConfigService)
-  private readonly configService: ConfigService;
+  @Inject(AuthService)
+  private readonly authService: AuthService;
 
   /**
    * 用户登陆
@@ -94,26 +90,9 @@ export class UserService {
       createdAt: existUser.createdAt,
     };
 
-    vo.accessToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-        roles: vo.userInfo.roles,
-        permission: vo.userInfo.permissions,
-      },
-      {
-        expiresIn: this.configService.get('jwt_access_exp') ?? '30m',
-      },
-    );
+    vo.accessToken = this.authService.generateAccessToken(vo.userInfo);
+    vo.refreshToken = this.authService.generateRefreshToken(vo.userInfo.id);
 
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      {
-        expiresIn: this.configService.get('jwt_refresh_exp') ?? '7d',
-      },
-    );
     return vo;
   }
 
@@ -122,38 +101,18 @@ export class UserService {
    */
   async handleRefreshToken(refreshToken: string) {
     try {
-      const verifyData = this.jwtService.verify<{
-        userId: number;
-        isAdmin: boolean;
-      }>(refreshToken);
+      const verifyData = this.authService.verifyRefreshToken(refreshToken);
+
       const existUser = await this.findUserById(
         verifyData.userId,
         verifyData.isAdmin,
       );
 
-      const nextAccessToken = this.jwtService.sign(
-        {
-          userId: existUser.id,
-          username: existUser.username,
-          roles: existUser.roles,
-          permission: existUser.permissions,
-        },
-        {
-          expiresIn: this.configService.get('jwt_access_exp') ?? '30m',
-        },
+      const nextAccessToken = this.authService.generateAccessToken(existUser);
+      const nextRefreshToken = this.authService.generateRefreshToken(
+        existUser.id,
       );
 
-      const nextRefreshToken = this.jwtService.sign(
-        {
-          userId: existUser.id,
-          username: existUser.username,
-          roles: existUser.roles,
-          permission: existUser.permissions,
-        },
-        {
-          expiresIn: this.configService.get('jwt_refresh_exp') ?? '7d',
-        },
-      );
       return {
         accessToken: nextAccessToken,
         refreshToken: nextRefreshToken,
@@ -204,7 +163,7 @@ export class UserService {
    * @param userId
    * @param isAdmin
    */
-  async findUserById(userId: number, isAdmin: boolean) {
+  async findUserById(userId: number, isAdmin: boolean): Promise<PayLoad> {
     const existUser = await this.userRepository.findOne({
       where: { id: userId, isAdmin },
       relations: ['roles', 'roles.permissions'],
@@ -252,6 +211,9 @@ export class UserService {
     return '验证码发送成功';
   }
 
+  /**
+   * 开发环境初始化数据
+   */
   async devInit() {
     const user1 = new User();
     user1.username = 'darlin';

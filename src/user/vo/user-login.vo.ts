@@ -22,6 +22,7 @@ interface UserInfo {
   permissions: string[];
 }
 
+export interface PayLoad extends Partial<UserInfo> {}
 export class LoginUserVo {
   userInfo: UserInfo;
 
