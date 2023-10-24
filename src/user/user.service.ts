@@ -84,7 +84,6 @@ export class UserService {
       }),
     );
     if (err) {
-      console.log(err);
       throw new BadRequestException(JSON.stringify(err));
     }
     return '验证码发送成功';

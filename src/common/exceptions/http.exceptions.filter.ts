@@ -3,12 +3,16 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger();
   convertErrorMessage(error: any): string {
+    this.logger.error(error);
+
     if (typeof error === 'string') {
       return error;
     } else if (typeof error === 'object') {
