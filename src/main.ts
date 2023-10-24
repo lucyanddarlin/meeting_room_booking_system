@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import { BaseExceptionsFilter } from './common/exceptions/base.exceptions.filter';
 import { HttpExceptionsFilter } from './common/exceptions/http.exceptions.filter';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,8 @@ async function bootstrap() {
   app.useGlobalFilters(new BaseExceptionsFilter(), new HttpExceptionsFilter());
   // 全局 DTO 参数校验
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+  // 获取全局配置项
+  const configService = app.get(ConfigService);
+  await app.listen(configService.get('nest_server_port'));
 }
 bootstrap();

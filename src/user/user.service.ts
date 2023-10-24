@@ -13,11 +13,12 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { to } from 'src/utils';
 import { EmailService } from 'src/email/email.service';
-
-/**
- * bcrypt 加盐轮数
- */
-const saltRounds = 10;
+import {
+  CAPTCHA_BEGIN_INDEX,
+  CAPTCHA_END_INDEX,
+  CAPTCHA_EXPIRE_TIME,
+  SALT_ROUNDS,
+} from 'src/config';
 
 @Injectable()
 export class UserService {
@@ -53,7 +54,7 @@ export class UserService {
     }
 
     const nextUser = new User();
-    const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
     nextUser.username = user.username;
     nextUser.password = hashedPassword;
     nextUser.nickName = user.nickName;
@@ -72,9 +73,15 @@ export class UserService {
    * 获取验证码
    */
   async getCaptcha(address: string) {
-    const captchaCode = Math.random().toString().slice(2, 8);
+    const captchaCode = Math.random()
+      .toString()
+      .slice(CAPTCHA_BEGIN_INDEX, CAPTCHA_END_INDEX);
 
-    await this.redisService.set(`captcha_${address}`, captchaCode, 60);
+    await this.redisService.set(
+      `captcha_${address}`,
+      captchaCode,
+      CAPTCHA_EXPIRE_TIME,
+    );
 
     const [err] = await to(
       this.emailService.sendCaptcha({
