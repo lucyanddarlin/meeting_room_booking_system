@@ -12,6 +12,8 @@ import { Permission } from './user/entities/Permission';
 import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { LoginGuard } from './guard/login.guard';
 
 @Module({
   imports: [
@@ -58,6 +60,12 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: LoginGuard,
+    },
+  ],
 })
 export class AppModule {}
