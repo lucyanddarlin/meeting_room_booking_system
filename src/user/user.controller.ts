@@ -3,6 +3,8 @@ import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserLoginDto } from './dto/login-user.dto';
 import { Public } from 'src/decorator/public.decorator';
+import { PayLoadUser } from 'src/decorator/userinfo.decorator';
+import { PayLoad } from './vo/user-login.vo';
 
 @Controller('user')
 export class UserController {
@@ -39,7 +41,11 @@ export class UserController {
   }
 
   @Get('userinfo')
-  async getUserInfo() {}
+  async getUserInfo(@PayLoadUser('id') user: PayLoad) {
+    console.log(user);
+
+    return 'next';
+  }
 
   @Get('dev-init')
   async devInit() {
