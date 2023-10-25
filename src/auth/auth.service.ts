@@ -33,7 +33,7 @@ export class AuthService {
   generateAccessToken(payload: PayLoad): string {
     const accessToken = this.jwtService.sign(
       {
-        userId: payload.id,
+        id: payload.id,
         username: payload.username,
         roles: payload.roles,
         permissions: payload.permissions,
@@ -52,7 +52,7 @@ export class AuthService {
   generateRefreshToken(payload: number): string {
     const accessToken = this.jwtService.sign(
       {
-        userId: payload,
+        id: payload,
       },
       {
         expiresIn: this.configService.get('jwt_refresh_exp') ?? '7d',

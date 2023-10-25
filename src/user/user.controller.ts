@@ -38,6 +38,9 @@ export class UserController {
     return this.userService.getCaptcha(address);
   }
 
+  @Get('userinfo')
+  async getUserInfo() {}
+
   @Get('dev-init')
   async devInit() {
     return await this.userService.devInit();

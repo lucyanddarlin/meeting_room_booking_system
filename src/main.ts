@@ -5,6 +5,7 @@ import { TransformInterceptor } from './common/interceptor/transform.interceptor
 import { BaseExceptionsFilter } from './common/exceptions/base.exceptions.filter';
 import { HttpExceptionsFilter } from './common/exceptions/http.exceptions.filter';
 import { ConfigService } from '@nestjs/config';
+import { InvokeRecordInterceptor } from './common/interceptor/invoke-record.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,8 @@ async function bootstrap() {
   app.enableCors();
   // 全局响应数据转换
   app.useGlobalInterceptors(new TransformInterceptor());
+  // 全局接口跟踪
+  app.useGlobalInterceptors(new InvokeRecordInterceptor());
   // 全局错误处理
   app.useGlobalFilters(new BaseExceptionsFilter(), new HttpExceptionsFilter());
   // 全局 DTO 参数校验

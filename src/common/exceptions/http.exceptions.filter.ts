@@ -30,7 +30,7 @@ export class HttpExceptionsFilter implements ExceptionFilter {
 
     response.status(status).json({
       data: null,
-      status: status,
+      code: status,
       message: this.convertErrorMessage(exception.getResponse()),
     });
   }
