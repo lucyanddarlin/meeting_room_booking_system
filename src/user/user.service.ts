@@ -68,16 +68,9 @@ export class UserService {
     if (!passwordVerification) {
       throw new BadRequestException('密码错误');
     }
-    const vo = new LoginUserVo();
-    vo.userInfo = {
+    const payLoad: PayLoad = {
       id: existUser.id,
       username: existUser.username,
-      nickName: existUser.nickName,
-      email: existUser.email,
-      phone: existUser.phone,
-      avatar: existUser.avatar,
-      isFrozen: existUser.isFrozen,
-      isAdmin: existUser.isAdmin,
       roles: existUser.roles.map((r) => r.name),
       permissions: existUser.roles.reduce((arr, cur) => {
         cur.permissions.forEach((p) => {
@@ -87,11 +80,10 @@ export class UserService {
         });
         return arr;
       }, []),
-      createdAt: existUser.createdAt,
     };
-
-    vo.accessToken = this.authService.generateAccessToken(vo.userInfo);
-    vo.refreshToken = this.authService.generateRefreshToken(vo.userInfo.id);
+    const vo = new LoginUserVo();
+    vo.accessToken = this.authService.generateAccessToken(payLoad);
+    vo.refreshToken = this.authService.generateRefreshToken(payLoad.id);
 
     return vo;
   }
@@ -159,7 +151,7 @@ export class UserService {
   }
 
   /**
-   * 根据 ID 查询用户
+   * 根据 ID 查询用户(包含对应的角色和权限)
    * @param userId
    * @param isAdmin
    */
@@ -182,6 +174,17 @@ export class UserService {
         return arr;
       }, []),
     };
+  }
+
+  async findUserDetailById(userId: number) {
+    const existUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!existUser) {
+      throw new BadRequestException('用户不存在');
+    }
+    const { password, isAdmin, updatedAt, ...rest } = existUser;
+    return rest;
   }
 
   /**

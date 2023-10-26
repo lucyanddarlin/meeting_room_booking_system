@@ -26,7 +26,7 @@ interface UserInfo {
 
 export interface PayLoad extends Partial<UserInfo> {}
 export class LoginUserVo {
-  userInfo: UserInfo;
+  // userInfo: UserInfo;
 
   accessToken: string;
 

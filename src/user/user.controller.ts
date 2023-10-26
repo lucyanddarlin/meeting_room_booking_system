@@ -4,7 +4,6 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { UserLoginDto } from './dto/login-user.dto';
 import { Public } from 'src/decorator/public.decorator';
 import { PayLoadUser } from 'src/decorator/userinfo.decorator';
-import { PayLoad } from './vo/user-login.vo';
 
 @Controller('user')
 export class UserController {
@@ -41,10 +40,8 @@ export class UserController {
   }
 
   @Get('userinfo')
-  async getUserInfo(@PayLoadUser('id') user: PayLoad) {
-    console.log(user);
-
-    return 'next';
+  async getUserInfo(@PayLoadUser('id') userId: number) {
+    return await this.userService.findUserDetailById(userId);
   }
 
   @Get('dev-init')
