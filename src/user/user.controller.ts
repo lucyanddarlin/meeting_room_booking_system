@@ -44,7 +44,10 @@ export class UserController {
     @PayLoadUser('id') userId: number,
     @Body() updateUserPassword: UpdateUserPasswordDto,
   ) {
-    console.log(userId, updateUserPassword);
+    return await this.userService.updateUserPassword(
+      userId,
+      updateUserPassword,
+    );
   }
 
   @Get('dev-init')

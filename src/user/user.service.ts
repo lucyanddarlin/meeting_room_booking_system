@@ -157,7 +157,7 @@ export class UserService {
     updatePassword: UpdateUserPasswordDto,
   ) {
     const captcha = await this.redisService.get(
-      `update_password_captcha_${updatePassword.email}`,
+      `${CAPTCHA_KEY.update_password}${updatePassword.email}`,
     );
     if (!captcha) {
       throw new BadRequestException('验证码已失效');
@@ -209,6 +209,10 @@ export class UserService {
     };
   }
 
+  /**
+   * 根据 userId 获取用户信息(部分信息)
+   * @param userId
+   */
   async findUserDetailById(userId: number) {
     const existUser = await this.userRepository.findOne({
       where: { id: userId },
