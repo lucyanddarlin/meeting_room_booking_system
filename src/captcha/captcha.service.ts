@@ -23,13 +23,18 @@ export class CaptchaService {
    * 获取用户注册的验证码
    */
   async getUserRegisterCaptcha(address: string) {
-    if (!this._verifyEmail(address)) {
-      throw new BadRequestException('邮箱格式错误');
-    }
     return await this._sendCaptchaCodeByKey(
       CAPTCHA_KEY.user_register,
       address,
       '注册验证码',
+    );
+  }
+
+  async getUpdatePasswordCaptcha(address: string) {
+    return await this._sendCaptchaCodeByKey(
+      CAPTCHA_KEY.update_password,
+      address,
+      '更新密码验证码',
     );
   }
 
@@ -62,6 +67,9 @@ export class CaptchaService {
     address: string,
     subject?: string,
   ) {
+    if (!this._verifyEmail(address)) {
+      throw new BadRequestException('邮箱格式错误');
+    }
     const captchaCode = this._generateCaptchaCode();
     await this.redisService.set(
       `${captchaKey}${address}`,

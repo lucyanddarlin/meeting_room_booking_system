@@ -13,4 +13,9 @@ export class CaptchaController {
   getUserRegisterCaptcha(@MQuery('address') address: string) {
     return this.captchaService.getUserRegisterCaptcha(address);
   }
+
+  @Get('password/update')
+  async getUpdatePasswordCaptcha(@MQuery('address') address: string) {
+    return await this.captchaService.getUpdatePasswordCaptcha(address);
+  }
 }
