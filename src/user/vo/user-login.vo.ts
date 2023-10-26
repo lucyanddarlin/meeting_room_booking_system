@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Permission } from '../entities/Permission';
 
 interface UserInfo {
@@ -28,7 +29,9 @@ export interface PayLoad extends Partial<UserInfo> {}
 export class LoginUserVo {
   // userInfo: UserInfo;
 
+  @ApiProperty()
   accessToken: string;
 
+  @ApiProperty()
   refreshToken: string;
 }

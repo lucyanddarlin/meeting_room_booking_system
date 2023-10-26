@@ -26,7 +26,11 @@ export class InvokeRecordInterceptor implements NestInterceptor {
       } invoked...`,
     );
 
-    this.logger.debug(`user: ${request?.user?.id}, ${request?.user?.username}`);
+    this.logger.debug(
+      `user: ${request?.user?.id ?? 'no_ID'}, ${
+        request?.user?.username ?? 'no_User'
+      }`,
+    );
 
     const now = Date.now();
 

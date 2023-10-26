@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { paginate, paginateRawAndEntities } from 'nestjs-typeorm-paginate';
+import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 
 import { User } from './entities/User';
 import { Role } from './entities/Role';
@@ -22,6 +22,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
 import { getPaginationOptions } from 'src/utils/paginate';
+import { UserDetailVo } from './vo/user-detail.vo';
+import { UserListVo } from './vo/user-list.vo';
 
 @Injectable()
 export class UserService {
@@ -263,7 +265,7 @@ export class UserService {
    * 根据 userId 获取用户信息(部分信息)
    * @param userId
    */
-  async findUserDetailById(userId: number) {
+  async findUserDetailById(userId: number): Promise<UserDetailVo> {
     const existUser = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -279,7 +281,7 @@ export class UserService {
    * 用户的分页(按照 updatedAt 进行排序)
    * @param page
    */
-  async paginate(page: number, limit: number) {
+  async paginate(page: number, limit: number): Promise<UserListVo> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     queryBuilder.orderBy('user.updatedAt', 'DESC');
     const [paginate] = await paginateRawAndEntities(

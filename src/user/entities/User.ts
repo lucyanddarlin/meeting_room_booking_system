@@ -7,13 +7,16 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 import { Role } from './Role';
 
 @Entity({ name: 'users' })
 export class User {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty()
   @Column({
     length: 50,
     comment: '用户名',
@@ -26,18 +29,21 @@ export class User {
   })
   password: string;
 
+  @ApiProperty()
   @Column({
     length: 50,
     comment: '昵称',
   })
   nickName: string;
 
+  @ApiProperty()
   @Column({
     length: 50,
     comment: '邮箱',
   })
   email: string;
 
+  @ApiProperty()
   @Column({
     length: 100,
     comment: '头像',
@@ -45,6 +51,7 @@ export class User {
   })
   avatar: string;
 
+  @ApiProperty()
   @Column({
     length: 20,
     comment: '手机号',
@@ -52,21 +59,25 @@ export class User {
   })
   phone: string;
 
+  @ApiProperty()
   @Column({
     comment: '是否冻结',
     default: false,
   })
   isFrozen: boolean;
 
+  @ApiProperty()
   @Column({
     comment: '是否为管理员',
     default: false,
   })
   isAdmin: boolean;
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
