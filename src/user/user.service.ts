@@ -15,11 +15,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { to } from 'src/utils';
 import { EmailService } from 'src/email/email.service';
-import {
-  CAPTCHA_BEGIN_INDEX,
-  CAPTCHA_END_INDEX,
-  CAPTCHA_EXPIRE_TIME,
-} from 'src/config';
+import { CAPTCHA_KEY } from 'src/config';
 import { UserLoginDto } from './dto/login-user.dto';
 import { LoginUserVo, PayLoad } from './vo/user-login.vo';
 import { AuthService } from 'src/auth/auth.service';
@@ -118,7 +114,9 @@ export class UserService {
    * @param user
    */
   async register(user: RegisterUserDto) {
-    const captcha = await this.redisService.get(`captcha_${user.email}`);
+    const captcha = await this.redisService.get(
+      `${CAPTCHA_KEY.user_register}${user.email}`,
+    );
 
     if (!captcha) {
       throw new BadRequestException('验证码已失效');
@@ -149,6 +147,11 @@ export class UserService {
     return '注册成功';
   }
 
+  /**
+   * 修改密码
+   * @param userId
+   * @param updatePassword
+   */
   async updateUserPassword(
     userId: number,
     updatePassword: UpdateUserPasswordDto,
@@ -158,6 +161,8 @@ export class UserService {
     );
     if (!captcha) {
       throw new BadRequestException('验证码已失效');
+    } else if (captcha !== updatePassword.captcha) {
+      throw new BadRequestException('验证码错误');
     }
     const existUser = await this.userRepository.findOne({
       where: { id: userId },
@@ -165,6 +170,14 @@ export class UserService {
     if (!existUser) {
       throw new BadRequestException('用户不存在');
     }
+    existUser.password = await this.authService.hashPassword(
+      updatePassword.password,
+    );
+    const [err] = await to(this.userRepository.save(existUser));
+    if (err) {
+      throw new BadRequestException('保存用户异常:' + err.message);
+    }
+    return '修改密码成功';
   }
 
   /**
@@ -206,33 +219,6 @@ export class UserService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, isAdmin, updatedAt, ...rest } = existUser;
     return rest;
-  }
-
-  /**
-   * 获取验证码
-   */
-  async getCaptcha(address: string) {
-    const captchaCode = Math.random()
-      .toString()
-      .slice(CAPTCHA_BEGIN_INDEX, CAPTCHA_END_INDEX);
-
-    await this.redisService.set(
-      `captcha_${address}`,
-      captchaCode,
-      CAPTCHA_EXPIRE_TIME,
-    );
-
-    const [err] = await to(
-      this.emailService.sendCaptcha({
-        to: address,
-        subject: '注册验证码',
-        html: `<p>你的验证码是 ${captchaCode}</p>`,
-      }),
-    );
-    if (err) {
-      throw new BadRequestException(JSON.stringify(err));
-    }
-    return '验证码发送成功';
   }
 
   /**

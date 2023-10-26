@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { LoginGuard } from './guard/login.guard';
 import { PermissionGuard } from './guard/permission.guard';
+import { CaptchaModule } from './captcha/captcha.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { PermissionGuard } from './guard/permission.guard';
     RedisModule,
     EmailModule,
     AuthModule,
+    CaptchaModule,
   ],
   controllers: [AppController],
   providers: [

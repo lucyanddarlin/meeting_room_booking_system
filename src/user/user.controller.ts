@@ -34,12 +34,6 @@ export class UserController {
     return await this.userService.handleRefreshToken(refreshToken);
   }
 
-  @Get('captcha')
-  @Public()
-  async captcha(@Query('address') address: string) {
-    return this.userService.getCaptcha(address);
-  }
-
   @Get('userinfo')
   async getUserInfo(@PayLoadUser('id') userId: number) {
     return await this.userService.findUserDetailById(userId);
