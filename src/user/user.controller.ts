@@ -5,6 +5,7 @@ import { UserLoginDto } from './dto/login-user.dto';
 import { Public } from 'src/decorator/public.decorator';
 import { PayLoadUser } from 'src/decorator/userinfo.decorator';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
 
 @Controller('user')
 export class UserController {
@@ -48,6 +49,14 @@ export class UserController {
       userId,
       updateUserPassword,
     );
+  }
+
+  @Post('userinfo/update')
+  async updateUserInfo(
+    @PayLoadUser('id') userId: number,
+    @Body() updateUserInfo: UpdateUserInfoDto,
+  ) {
+    return await this.userService.updateUserInfo(userId, updateUserInfo);
   }
 
   @Get('dev-init')

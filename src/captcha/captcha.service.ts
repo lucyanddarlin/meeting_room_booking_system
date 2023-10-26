@@ -21,6 +21,7 @@ export class CaptchaService {
 
   /**
    * 获取用户注册的验证码
+   * @param address
    */
   async getUserRegisterCaptcha(address: string) {
     return await this._sendCaptchaCodeByKey(
@@ -30,6 +31,10 @@ export class CaptchaService {
     );
   }
 
+  /**
+   * 获取修改密码的验证码
+   * @param address
+   */
   async getUpdatePasswordCaptcha(address: string) {
     return await this._sendCaptchaCodeByKey(
       CAPTCHA_KEY.update_password,

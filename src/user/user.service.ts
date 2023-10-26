@@ -20,6 +20,7 @@ import { UserLoginDto } from './dto/login-user.dto';
 import { LoginUserVo, PayLoad } from './vo/user-login.vo';
 import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
 
 @Injectable()
 export class UserService {
@@ -178,6 +179,29 @@ export class UserService {
       throw new BadRequestException('保存用户异常:' + err.message);
     }
     return '修改密码成功';
+  }
+
+  /**
+   * 修改用户信息
+   * @param userId
+   * @param updateUserInfo
+   */
+  async updateUserInfo(userId: number, updateUserInfo: UpdateUserInfoDto) {
+    const existUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!existUser) {
+      throw new BadRequestException('用户不存在');
+    }
+    const phone = updateUserInfo?.phone ?? existUser.phone;
+    const nickName = updateUserInfo?.nickName ?? existUser.nickName;
+    const avatar = updateUserInfo?.avatar ?? existUser.avatar;
+    const nextUser = { ...existUser, phone, nickName, avatar };
+    const [err] = await to(this.userRepository.save(nextUser));
+    if (err) {
+      throw new BadRequestException('更新用户信息异常:' + err.message);
+    }
+    return '修改成功';
   }
 
   /**

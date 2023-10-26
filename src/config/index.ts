@@ -1,3 +1,4 @@
+// TODO: 根据模块拆分不同的常量
 /**
  * 加盐轮数
  */
@@ -24,4 +25,5 @@ export const CAPTCHA_END_INDEX = 8;
 export enum CAPTCHA_KEY {
   user_register = 'captcha_user_register_',
   update_password = 'captcha_update_password_',
+  update_userinfo = 'captcha_update_userinfo_',
 }
