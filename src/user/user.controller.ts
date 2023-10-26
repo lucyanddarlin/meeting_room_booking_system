@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UserLoginDto } from './dto/login-user.dto';
@@ -7,7 +15,7 @@ import { PayLoadUser } from 'src/decorator/userinfo.decorator';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
 import { MQuery } from 'src/decorator/mquery.decorator';
-import { USER_FREEZE_STATUS } from 'src/config';
+import { USER_FREEZE_STATUS, defaultPaginationParams } from 'src/config';
 
 @Controller('user')
 export class UserController {
@@ -75,6 +83,24 @@ export class UserController {
       userId,
       USER_FREEZE_STATUS.UnFrozen,
     );
+  }
+
+  @Get('list')
+  async getUserList(
+    @Query(
+      'page',
+      new DefaultValuePipe(defaultPaginationParams.currentPage),
+      ParseIntPipe,
+    )
+    page: number,
+    @Query(
+      'limit',
+      new DefaultValuePipe(defaultPaginationParams.pageSize),
+      ParseIntPipe,
+    )
+    limit: number,
+  ) {
+    return await this.userService.paginate(page, limit);
   }
 
   @Get('dev-init')

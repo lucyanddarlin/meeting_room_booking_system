@@ -33,6 +33,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "mysql2": "^3.6.2",
+    "nestjs-typeorm-paginate": "^4.0.4",
     "nodemailer": "^6.9.7",
     "redis": "^4.6.10",
     "reflect-metadata": "^0.1.13",

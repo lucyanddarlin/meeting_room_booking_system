@@ -35,3 +35,16 @@ export const USER_FREEZE_STATUS = {
   UnFrozen: false,
   Frozen: true,
 };
+
+/**
+ * 分页的最大 limit
+ */
+export const MAX_PAGE_SIZE = 100;
+
+/**
+ * 分页的默认页数和大小
+ */
+export const defaultPaginationParams: PaginationParams = {
+  currentPage: 1,
+  pageSize: 10,
+};

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate, paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 
 import { User } from './entities/User';
 import { Role } from './entities/Role';
@@ -20,6 +21,7 @@ import { LoginUserVo, PayLoad } from './vo/user-login.vo';
 import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
+import { getPaginationOptions } from 'src/utils/paginate';
 
 @Injectable()
 export class UserService {
@@ -224,6 +226,11 @@ export class UserService {
   }
 
   /**
+   * 获取用户列表
+   */
+  getUserList() {}
+
+  /**
    * 根据 ID 查询用户(包含对应的角色和权限)
    * @param userId
    * @param isAdmin
@@ -266,6 +273,25 @@ export class UserService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, isAdmin, updatedAt, ...rest } = existUser;
     return rest;
+  }
+
+  /**
+   * 用户的分页(按照 updatedAt 进行排序)
+   * @param page
+   */
+  async paginate(page: number, limit: number) {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    queryBuilder.orderBy('user.updatedAt', 'DESC');
+    const [paginate] = await paginateRawAndEntities(
+      queryBuilder,
+      getPaginationOptions(page, limit),
+    );
+    const nextList = paginate.items.map((i) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...rest } = i;
+      return rest;
+    });
+    return { list: nextList, meta: paginate.meta };
   }
 
   /**
