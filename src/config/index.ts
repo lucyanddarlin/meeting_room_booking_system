@@ -27,3 +27,11 @@ export enum CAPTCHA_KEY {
   update_password = 'captcha_update_password_',
   update_userinfo = 'captcha_update_userinfo_',
 }
+
+/**
+ * 用户状态(是否被冻结)
+ */
+export const USER_FREEZE_STATUS = {
+  UnFrozen: false,
+  Frozen: true,
+};

@@ -6,6 +6,8 @@ import { Public } from 'src/decorator/public.decorator';
 import { PayLoadUser } from 'src/decorator/userinfo.decorator';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserInfoDto } from './dto/update-userinfo.dto';
+import { MQuery } from 'src/decorator/mquery.decorator';
+import { USER_FREEZE_STATUS } from 'src/config';
 
 @Controller('user')
 export class UserController {
@@ -57,6 +59,22 @@ export class UserController {
     @Body() updateUserInfo: UpdateUserInfoDto,
   ) {
     return await this.userService.updateUserInfo(userId, updateUserInfo);
+  }
+
+  @Get('freeze')
+  async freezeUser(@MQuery('id') userId: number) {
+    return await this.userService.updateUserStatus(
+      userId,
+      USER_FREEZE_STATUS.Frozen,
+    );
+  }
+
+  @Get('unfreeze')
+  async unFreezeUser(@MQuery('id') userId: number) {
+    return await this.userService.updateUserStatus(
+      userId,
+      USER_FREEZE_STATUS.UnFrozen,
+    );
   }
 
   @Get('dev-init')

@@ -192,12 +192,35 @@ export class UserService {
     const phone = updateUserInfo?.phone ?? existUser.phone;
     const nickName = updateUserInfo?.nickName ?? existUser.nickName;
     const avatar = updateUserInfo?.avatar ?? existUser.avatar;
-    const nextUser = { ...existUser, phone, nickName, avatar };
+    const nextUser: User = { ...existUser, phone, nickName, avatar };
     const [err] = await to(this.userRepository.save(nextUser));
     if (err) {
       throw new BadRequestException('更新用户信息异常:' + err.message);
     }
     return '修改成功';
+  }
+
+  /**
+   * 冻结用户
+   * @param userId
+   */
+  async updateUserStatus(userId: number, nextStatus: boolean) {
+    const existUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!existUser) {
+      throw new BadRequestException('用户不存在');
+    }
+    if (existUser.isFrozen === nextStatus) {
+      return '已是目标状态';
+    }
+    const [err] = await to(
+      this.userRepository.save({ ...existUser, isFrozen: nextStatus }),
+    );
+    if (err) {
+      throw new BadRequestException('操作异常');
+    }
+    return '操作成功';
   }
 
   /**
