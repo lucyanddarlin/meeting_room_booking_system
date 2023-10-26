@@ -14,7 +14,6 @@ import { Permission } from './entities/Permission';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { to } from 'src/utils';
-import { EmailService } from 'src/email/email.service';
 import { CAPTCHA_KEY } from 'src/config';
 import { UserLoginDto } from './dto/login-user.dto';
 import { LoginUserVo, PayLoad } from './vo/user-login.vo';
@@ -37,9 +36,6 @@ export class UserService {
 
   @Inject(RedisService)
   private readonly redisService: RedisService;
-
-  @Inject(EmailService)
-  private readonly emailService: EmailService;
 
   @Inject(AuthService)
   private readonly authService: AuthService;
