@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/User';
 import { Role } from './entities/Role';
@@ -20,11 +19,11 @@ import {
   CAPTCHA_BEGIN_INDEX,
   CAPTCHA_END_INDEX,
   CAPTCHA_EXPIRE_TIME,
-  SALT_ROUNDS,
 } from 'src/config';
 import { UserLoginDto } from './dto/login-user.dto';
 import { LoginUserVo, PayLoad } from './vo/user-login.vo';
 import { AuthService } from 'src/auth/auth.service';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Injectable()
 export class UserService {
@@ -61,7 +60,7 @@ export class UserService {
     if (!existUser) {
       throw new BadRequestException('用户名不存在');
     }
-    const passwordVerification = bcrypt.compareSync(
+    const passwordVerification = await this.authService.verifyPassword(
       user.password,
       existUser.password,
     );
@@ -135,7 +134,7 @@ export class UserService {
     }
 
     const nextUser = new User();
-    const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+    const hashedPassword = await this.authService.hashPassword(user.password);
     nextUser.username = user.username;
     nextUser.password = hashedPassword;
     nextUser.nickName = user.nickName;
@@ -150,6 +149,24 @@ export class UserService {
     return '注册成功';
   }
 
+  async updateUserPassword(
+    userId: number,
+    updatePassword: UpdateUserPasswordDto,
+  ) {
+    const captcha = await this.redisService.get(
+      `update_password_captcha_${updatePassword.email}`,
+    );
+    if (!captcha) {
+      throw new BadRequestException('验证码已失效');
+    }
+    const existUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!existUser) {
+      throw new BadRequestException('用户不存在');
+    }
+  }
+
   /**
    * 根据 ID 查询用户(包含对应的角色和权限)
    * @param userId
@@ -160,6 +177,9 @@ export class UserService {
       where: { id: userId, isAdmin },
       relations: ['roles', 'roles.permissions'],
     });
+    if (!existUser) {
+      throw new BadRequestException('用户不存在');
+    }
     return {
       id: existUser.id,
       username: existUser.username,
@@ -183,6 +203,7 @@ export class UserService {
     if (!existUser) {
       throw new BadRequestException('用户不存在');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, isAdmin, updatedAt, ...rest } = existUser;
     return rest;
   }
@@ -220,7 +241,7 @@ export class UserService {
   async devInit() {
     const user1 = new User();
     user1.username = 'darlin';
-    user1.password = await bcrypt.hash('111111', SALT_ROUNDS);
+    user1.password = await this.authService.hashPassword('111111');
     user1.email = 'darlin@xx.com';
     user1.isAdmin = true;
     user1.nickName = 'darlin';
@@ -228,7 +249,7 @@ export class UserService {
 
     const user2 = new User();
     user2.username = 'lily';
-    user2.password = await bcrypt.hash('111111', SALT_ROUNDS);
+    user2.password = await this.authService.hashPassword('111111');
     user2.email = 'lily@yy.com';
     user2.nickName = 'lily';
 

@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+
+import { SALT_ROUNDS } from 'src/config';
 import { PayLoad } from 'src/user/vo/user-login.vo';
 
 interface VerifyRefreshTokenResult {
@@ -15,6 +18,23 @@ export class AuthService {
 
   @Inject(ConfigService)
   private readonly configService: ConfigService;
+
+  /**
+   * 加密密码
+   * @param password
+   */
+  async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, SALT_ROUNDS);
+  }
+
+  /**
+   * 验证密码
+   * @param password 明文密码
+   * @param hashPassword 加密密码
+   */
+  async verifyPassword(password: string, hashPassword): Promise<boolean> {
+    return await bcrypt.compare(password, hashPassword);
+  }
 
   /**
    * 验证 refreshToken

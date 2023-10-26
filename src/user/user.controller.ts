@@ -4,6 +4,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { UserLoginDto } from './dto/login-user.dto';
 import { Public } from 'src/decorator/public.decorator';
 import { PayLoadUser } from 'src/decorator/userinfo.decorator';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -42,6 +43,14 @@ export class UserController {
   @Get('userinfo')
   async getUserInfo(@PayLoadUser('id') userId: number) {
     return await this.userService.findUserDetailById(userId);
+  }
+
+  @Post('password/update')
+  async updateUserPassword(
+    @PayLoadUser('id') userId: number,
+    @Body() updateUserPassword: UpdateUserPasswordDto,
+  ) {
+    console.log(userId, updateUserPassword);
   }
 
   @Get('dev-init')
